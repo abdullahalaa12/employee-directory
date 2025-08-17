@@ -1,41 +1,45 @@
 package com.employee_directory.employee_directory.service;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
-import com.employee_directory.employee_directory.dao.EmployeeDAO;
+import com.employee_directory.employee_directory.dao.EmployeeRepository;
 import com.employee_directory.employee_directory.entity.Employee;
+import com.employee_directory.employee_directory.rest.EmployeeNotFoundException;
 
 @Service
 public class EmployeeServiceImpl implements EmployeeService {
-    private final EmployeeDAO employeeDAO;
+    private final EmployeeRepository employeeRepository;
 
-    public EmployeeServiceImpl(EmployeeDAO employeeDAO) {
-        this.employeeDAO = employeeDAO;
+    public EmployeeServiceImpl(EmployeeRepository employeeRepository) {
+        this.employeeRepository = employeeRepository;
     }
 
     @Override
     public List<Employee> findAll() {
-        return employeeDAO.findAll();
+        return employeeRepository.findAll();
     }
 
     @Override
-    public Employee findById(int id) {
-        return employeeDAO.findById(id);
+    public Employee findById(Integer id) {
+        Optional<Employee> result = employeeRepository.findById(id);
+
+        if (result.isPresent())
+            return result.get();
+        else
+            throw new EmployeeNotFoundException("Did not find employee id - " + id);
     }
 
-    @Transactional
     @Override
     public Employee save(Employee employee) {
-        return employeeDAO.save(employee);
+        return employeeRepository.save(employee);
     }
 
-    @Transactional
     @Override
-    public void deleteById(int id) {
-        employeeDAO.deleteById(id);
+    public void deleteById(Integer id) {
+        employeeRepository.deleteById(id);
     }
 
 }
