@@ -1,14 +1,12 @@
--- Drop and recreate Spring Security tables for consistent behavior with create-drop
-DROP TABLE IF EXISTS authorities;
-DROP TABLE IF EXISTS users;
-CREATE TABLE users (
+-- Create Spring Security tables for production (safe for existing data)
+CREATE TABLE IF NOT EXISTS users (
     username VARCHAR(50) NOT NULL PRIMARY KEY,
-    password CHAR(68) NOT NULL,
-    enabled boolean NOT NULL
+    password VARCHAR(500) NOT NULL,
+    enabled BOOLEAN NOT NULL
 );
-CREATE TABLE authorities (
+CREATE TABLE IF NOT EXISTS authorities (
     username VARCHAR(50) NOT NULL,
     authority VARCHAR(50) NOT NULL,
     CONSTRAINT fk_authorities_users FOREIGN KEY(username) REFERENCES users(username)
 );
-CREATE UNIQUE INDEX ix_auth_username ON authorities (username, authority);
+CREATE UNIQUE INDEX IF NOT EXISTS ix_auth_username ON authorities (username, authority);

@@ -1,0 +1,47 @@
+services:
+  # Database Service
+  db:
+    image: postgres:15-alpine
+    container_name: employee-db
+    environment:
+      POSTGRES_DB: employee_directory
+      POSTGRES_USER: abdullah
+      POSTGRES_PASSWORD: postgres
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    networks:
+      - app-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U abdullah -d employee_directory"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # Spring Boot Application Service
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: employee-app
+    environment:
+      SPRING_PROFILES_ACTIVE: docker
+      SPRING_DATASOURCE_URL: jdbc:postgresql://db:5432/employee_directory
+      SPRING_DATASOURCE_USERNAME: abdullah
+      SPRING_DATASOURCE_PASSWORD: postgres
+    ports:
+      - "8080:8080"
+    depends_on:
+      db:
+        condition: service_healthy
+    networks:
+      - app-network
+    restart: unless-stopped
+
+volumes:
+  pgdata:
+
+networks:
+  app-network:
+    driver: bridge
