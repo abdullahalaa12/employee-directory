@@ -1,6 +1,6 @@
 # Multi-stage build for Render deployment
 # Stage 1: Build the application
-FROM maven:3.9.4-openjdk-17-slim AS build
+FROM maven AS build
 
 # Set working directory
 WORKDIR /app
